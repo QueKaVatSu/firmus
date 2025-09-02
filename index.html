@@ -280,231 +280,250 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
         // Firebase ve Firestore Ayarları
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+
+        // Firebase loglarını etkinleştir
+        setLogLevel('debug');
+
+        let app, db, auth;
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch (e) {
+            console.error("Firebase kurulumu sırasında bir hata oluştu:", e);
+        }
 
         // Firebase ile kimlik doğrulama
         const signIn = async () => {
-            if (typeof __initial_auth_token !== 'undefined') {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
+            if (auth) {
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
             }
         };
 
-        signIn();
+        // Bu kısımda Firebase kurulumu hatasından sonra bile diğer scriptin çalışması sağlanır
+        window.onload = async () => {
+            await signIn();
 
-        // Mouse Takip Efekti
-        const canvas = document.getElementById('trail-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        let mouseX = 0;
-        let mouseY = 0;
+            // Mouse Takip Efekti
+            const canvas = document.getElementById('trail-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let mouseX = 0;
+            let mouseY = 0;
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            for (let i = 0; i < 5; i++) {
-                particles.push({
-                    x: mouseX,
-                    y: mouseY,
-                    size: Math.random() * 3 + 1,
-                    initialOpacity: 0.25,
-                    initialLife: 50,
-                    life: 50,
-                    speedX: (Math.random() - 0.5) * 1,
-                    speedY: (Math.random() - 0.5) * 1
-                });
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
             }
-        });
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
 
-        function animate() {
-            requestAnimationFrame(animate);
-            ctx.fillStyle = 'rgba(13, 13, 13, 0.4)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                const p = particles[i];
-                p.x += p.speedX;
-                p.y += p.speedY;
-                p.life--;
-                p.opacity = p.initialOpacity * (p.life / p.initialLife);
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 255, 255, ${p.opacity})`;
-                ctx.fill();
-                ctx.closePath();
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                for (let i = 0; i < 5; i++) {
+                    particles.push({
+                        x: mouseX,
+                        y: mouseY,
+                        size: Math.random() * 3 + 1,
+                        initialOpacity: 0.25,
+                        initialLife: 50,
+                        life: 50,
+                        speedX: (Math.random() - 0.5) * 1,
+                        speedY: (Math.random() - 0.5) * 1
+                    });
+                }
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.fillStyle = 'rgba(13, 13, 13, 0.4)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    p.life--;
+                    p.opacity = p.initialOpacity * (p.life / p.initialLife);
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(0, 255, 255, ${p.opacity})`;
+                    ctx.fill();
+                    ctx.closePath();
+                }
+                particles = particles.filter(p => p.life > 0);
             }
-            particles = particles.filter(p => p.life > 0);
-        }
-        animate();
+            animate();
 
-        // Takvim ve Randevu Sistemi
-        const calendarDaysEl = document.getElementById('calendar-days');
-        const monthYearEl = document.getElementById('month-year');
-        const timeSlotsEl = document.getElementById('time-slots');
-        const slotInfoEl = document.getElementById('slot-info');
-        const userEmailInput = document.getElementById('user-email');
-        const bookButton = document.getElementById('book-appointment-btn');
-        const confirmationModal = document.getElementById('confirmation-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalMessage = document.getElementById('modal-message');
-        const closeModalButton = document.getElementById('close-modal');
+            // Takvim ve Randevu Sistemi
+            const calendarDaysEl = document.getElementById('calendar-days');
+            const monthYearEl = document.getElementById('month-year');
+            const timeSlotsEl = document.getElementById('time-slots');
+            const slotInfoEl = document.getElementById('slot-info');
+            const userEmailInput = document.getElementById('user-email');
+            const bookButton = document.getElementById('book-appointment-btn');
+            const confirmationModal = document.getElementById('confirmation-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMessage = document.getElementById('modal-message');
+            const closeModalButton = document.getElementById('close-modal');
 
-        const today = new Date();
-        const currentYear = today.getFullYear();
-        const currentMonth = today.getMonth();
-        const currentDay = today.getDate();
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth();
+            const currentDay = today.getDate();
 
-        let selectedDate = null;
-        let selectedTime = null;
-        const recipientEmail = "ataberksarsillmaz@gmail.com";
-        const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+            let selectedDate = null;
+            let selectedTime = null;
+            const recipientEmail = "ataberksarsillmaz@gmail.com";
+            const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
 
-        monthYearEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-        const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-        const numDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-        const lastDayOfLastMonth = new Date(currentYear, currentMonth, 0).getDate();
-        
-        let daysHtml = '';
-        const startDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
-        for (let i = 0; i < startDay; i++) {
-            daysHtml += `<div class="calendar-day text-gray-600">${lastDayOfLastMonth - startDay + i + 1}</div>`;
-        }
-        for (let i = 1; i <= numDaysInMonth; i++) {
-            let dayClasses = 'calendar-day rounded-xl transition-colors duration-200';
-            if (i < currentDay) {
-                dayClasses += ' bg-gray-700 text-gray-400 cursor-not-allowed';
-            } else {
-                dayClasses += ' selectable-day hover:bg-gray-800 cursor-pointer';
+            monthYearEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+            const numDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const lastDayOfLastMonth = new Date(currentYear, currentMonth, 0).getDate();
+            
+            let daysHtml = '';
+            const startDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+            for (let i = 0; i < startDay; i++) {
+                daysHtml += `<div class="calendar-day text-gray-600">${lastDayOfLastMonth - startDay + i + 1}</div>`;
             }
-            if (i === currentDay) {
-                dayClasses += ' is-today today-selectable';
+            for (let i = 1; i <= numDaysInMonth; i++) {
+                let dayClasses = 'calendar-day rounded-xl transition-colors duration-200';
+                if (i < currentDay) {
+                    dayClasses += ' bg-gray-700 text-gray-400 cursor-not-allowed';
+                } else {
+                    dayClasses += ' selectable-day hover:bg-gray-800 cursor-pointer';
+                }
+                if (i === currentDay) {
+                    dayClasses += ' is-today today-selectable';
+                }
+                daysHtml += `<div class="${dayClasses}" data-day="${i}">${i}</div>`;
             }
-            daysHtml += `<div class="${dayClasses}" data-day="${i}">${i}</div>`;
-        }
-        const totalDays = startDay + numDaysInMonth;
-        const remainingDays = 42 - totalDays;
-        if (remainingDays > 0 && totalDays > 35) {
-            for (let i = 1; i <= remainingDays; i++) {
-                daysHtml += `<div class="calendar-day text-gray-600">${i}</div>`;
+            const totalDays = startDay + numDaysInMonth;
+            const remainingDays = 42 - totalDays;
+            if (remainingDays > 0 && totalDays > 35) {
+                for (let i = 1; i <= remainingDays; i++) {
+                    daysHtml += `<div class="calendar-day text-gray-600">${i}</div>`;
+                }
             }
-        }
-        calendarDaysEl.innerHTML = daysHtml;
-        
-        window.addEventListener('load', () => {
+            calendarDaysEl.innerHTML = daysHtml;
+            
             const todayElement = document.querySelector('.calendar-day.is-today');
             if (todayElement) {
                 setTimeout(() => {
                     todayElement.classList.add('is-today-animated');
                 }, 500);
             }
-        });
 
-        function generateTimeSlots() {
-            timeSlotsEl.innerHTML = '';
-            for (let hour = 10; hour < 18; hour++) {
-                if (hour === 12 || hour === 13) continue; // 12-13 arasını atla
-                for (let minute = 0; minute < 60; minute += 30) {
-                    const time = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-                    const slotDiv = document.createElement('span');
-                    slotDiv.className = 'px-4 py-2 rounded-full border border-gray-700 text-sm hover:bg-indigo-600 transition-colors duration-200 cursor-pointer time-slot';
-                    slotDiv.textContent = time;
-                    slotDiv.dataset.time = time;
-                    timeSlotsEl.appendChild(slotDiv);
-                }
-            }
-        }
-
-        document.querySelectorAll('.selectable-day').forEach(dayEl => {
-            dayEl.addEventListener('click', () => {
-                document.querySelectorAll('.selectable-day').forEach(el => el.classList.remove('bg-indigo-600'));
-                dayEl.classList.add('bg-indigo-600');
-                const selectedDay = dayEl.dataset.day;
-                selectedDate = new Date(currentYear, currentMonth, parseInt(selectedDay, 10));
-                slotInfoEl.textContent = `${selectedDay} ${monthNames[currentMonth]} ${currentYear} için uygun saatleri seçin.`;
-                generateTimeSlots();
-            });
-        });
-
-        timeSlotsEl.addEventListener('click', (e) => {
-            if (e.target.classList.contains('time-slot')) {
-                document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('bg-indigo-600'));
-                e.target.classList.add('bg-indigo-600');
-                selectedTime = e.target.dataset.time;
-                if (selectedDate && selectedTime) {
-                    bookButton.disabled = false;
-                }
-            }
-        });
-
-        bookButton.addEventListener('click', async () => {
-            const userEmail = userEmailInput.value;
-            if (!userEmail || !selectedDate || !selectedTime) {
-                modalTitle.textContent = "Hata";
-                modalMessage.textContent = "Lütfen bir tarih, saat ve e-posta adresi girin.";
-                confirmationModal.style.display = 'flex';
-                return;
-            }
-
-            modalTitle.textContent = "Randevu Oluşturuluyor...";
-            modalMessage.textContent = "Lütfen bekleyin, randevunuz kaydediliyor.";
-            confirmationModal.style.display = 'flex';
-
-            try {
-                // Randevu verisini Firestore'a kaydet
-                const appointmentsCollection = collection(db, `artifacts/${appId}/public/data/appointments`);
-                await addDoc(appointmentsCollection, {
-                    date: selectedDate.toISOString(),
-                    time: selectedTime,
-                    email: userEmail,
-                    bookedAt: new Date().toISOString()
-                });
-
-                modalTitle.textContent = "Başarılı!";
-                modalMessage.innerHTML = `
-                    Randevunuz başarıyla oluşturuldu!
-                    <br><br>
-                    <strong>Tarih:</strong> ${selectedDate.toLocaleDateString('tr-TR')}
-                    <br>
-                    <strong>Saat:</strong> ${selectedTime}
-                    <br>
-                    <strong>E-posta:</strong> ${userEmail}
-                    <br><br>
-                    Bu randevu bilgileri veritabanına kaydedilmiştir. Gerçek bir takvim toplantısı için arka uç servisi gereklidir.
-                `;
-
-                // Formu sıfırla
-                selectedDate = null;
-                selectedTime = null;
-                bookButton.disabled = true;
-                userEmailInput.value = '';
-                document.querySelectorAll('.selectable-day').forEach(el => el.classList.remove('bg-indigo-600'));
+            function generateTimeSlots() {
                 timeSlotsEl.innerHTML = '';
-            } catch (e) {
-                console.error("Randevu oluşturulurken bir hata oluştu: ", e);
-                modalTitle.textContent = "Hata";
-                modalMessage.textContent = "Randevunuz oluşturulamadı. Lütfen tekrar deneyin.";
+                for (let hour = 10; hour < 18; hour++) {
+                    if (hour === 12 || hour === 13) continue; // 12-13 arasını atla
+                    for (let minute = 0; minute < 60; minute += 30) {
+                        const time = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+                        const slotDiv = document.createElement('span');
+                        slotDiv.className = 'px-4 py-2 rounded-full border border-gray-700 text-sm hover:bg-indigo-600 transition-colors duration-200 cursor-pointer time-slot';
+                        slotDiv.textContent = time;
+                        slotDiv.dataset.time = time;
+                        timeSlotsEl.appendChild(slotDiv);
+                    }
+                }
             }
-        });
 
-        closeModalButton.addEventListener('click', () => {
-            confirmationModal.style.display = 'none';
-        });
+            document.querySelectorAll('.selectable-day').forEach(dayEl => {
+                dayEl.addEventListener('click', () => {
+                    document.querySelectorAll('.selectable-day').forEach(el => el.classList.remove('bg-indigo-600'));
+                    dayEl.classList.add('bg-indigo-600');
+                    const selectedDay = dayEl.dataset.day;
+                    selectedDate = new Date(currentYear, currentMonth, parseInt(selectedDay, 10));
+                    slotInfoEl.textContent = `${selectedDay} ${monthNames[currentMonth]} ${currentYear} için uygun saatleri seçin.`;
+                    generateTimeSlots();
+                });
+            });
 
-        // Başlangıçta saatleri oluştur
-        generateTimeSlots();
+            timeSlotsEl.addEventListener('click', (e) => {
+                if (e.target.classList.contains('time-slot')) {
+                    document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('bg-indigo-600'));
+                    e.target.classList.add('bg-indigo-600');
+                    selectedTime = e.target.dataset.time;
+                    if (selectedDate && selectedTime) {
+                        bookButton.disabled = false;
+                    }
+                }
+            });
+
+            bookButton.addEventListener('click', async () => {
+                const userEmail = userEmailInput.value;
+                if (!userEmail || !selectedDate || !selectedTime) {
+                    modalTitle.textContent = "Hata";
+                    modalMessage.textContent = "Lütfen bir tarih, saat ve e-posta adresi girin.";
+                    confirmationModal.style.display = 'flex';
+                    return;
+                }
+
+                modalTitle.textContent = "Randevu Oluşturuluyor...";
+                modalMessage.textContent = "Lütfen bekleyin, randevunuz kaydediliyor.";
+                confirmationModal.style.display = 'flex';
+
+                try {
+                    // Randevu verisini Firestore'a kaydet
+                    if (db) {
+                        const appointmentsCollection = collection(db, `artifacts/${appId}/public/data/appointments`);
+                        await addDoc(appointmentsCollection, {
+                            date: selectedDate.toISOString(),
+                            time: selectedTime,
+                            email: userEmail,
+                            bookedAt: new Date().toISOString()
+                        });
+
+                        modalTitle.textContent = "Başarılı!";
+                        modalMessage.innerHTML = `
+                            Randevunuz başarıyla oluşturuldu!
+                            <br><br>
+                            <strong>Tarih:</strong> ${selectedDate.toLocaleDateString('tr-TR')}
+                            <br>
+                            <strong>Saat:</strong> ${selectedTime}
+                            <br>
+                            <strong>E-posta:</strong> ${userEmail}
+                            <br><br>
+                            Bu randevu bilgileri veritabanına kaydedilmiştir. Gerçek bir takvim toplantısı için arka uç servisi gereklidir.
+                        `;
+                    } else {
+                        modalTitle.textContent = "Hata";
+                        modalMessage.textContent = "Veritabanı bağlantısı kurulamadı. Lütfen tekrar deneyin.";
+                    }
+
+                    // Formu sıfırla
+                    selectedDate = null;
+                    selectedTime = null;
+                    bookButton.disabled = true;
+                    userEmailInput.value = '';
+                    document.querySelectorAll('.selectable-day').forEach(el => el.classList.remove('bg-indigo-600'));
+                    timeSlotsEl.innerHTML = '';
+                } catch (e) {
+                    console.error("Randevu oluşturulurken bir hata oluştu: ", e);
+                    modalTitle.textContent = "Hata";
+                    modalMessage.textContent = "Randevunuz oluşturulamadı. Lütfen tekrar deneyin.";
+                }
+            });
+
+            closeModalButton.addEventListener('click', () => {
+                confirmationModal.style.display = 'none';
+            });
+
+            // Başlangıçta saatleri oluştur
+            generateTimeSlots();
+        };
+
     </script>
 </body>
 </html>
