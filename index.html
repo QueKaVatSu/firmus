@@ -107,7 +107,7 @@
             left: 0;
             width: 100%;
             height: 100vh;
-            background-color: rgba(89, 2, 25, 0.65); /* #590219 renginin %65 opaklığı */
+            background-color: rgba(31, 41, 55, 0.075); /* Yüzde 50 daha transparan buzlu cam */
             z-index: -1;
         }
 
@@ -116,6 +116,15 @@
             .hero-content {
                 margin-top: -10vh; /* İstediğiniz yukarı kaydırma miktarını ayarlayabilirsiniz */
             }
+        }
+
+        /* Yeni Adresi için gradient metin */
+        .gradient-text {
+            background-image: linear-gradient(to right, #4ade80, #38bdf8); /* Galaxy AI turkuaz-yeşil gradient */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
         }
     </style>
 </head>
@@ -149,7 +158,7 @@
         <main class="min-h-screen flex items-center justify-center text-center relative z-10 py-16">
             <div class="hero-content">
                 <h1 class="text-4xl sm:text-6xl lg:text-8xl tracking-tight leading-none mb-6 text-white">
-                    Dijital Deneyimin<br><span class="text-[#590219]">Yeni Adresi</span>
+                    Dijital Deneyimin<br><span class="gradient-text">Yeni Adresi</span>
                 </h1>
                 <p class="text-lg sm:text-xl max-w-2xl mx-auto text-white font-light">
                     Elegant, fonksiyonel ve kullanıcı dostu yazılım çözümleriyle markanızın dijital geleceğini inşa ediyoruz.
