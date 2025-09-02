@@ -14,7 +14,6 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            cursor: none;
             background-color: #590219;
             color: #e5e5e5;
             line-height: 1.6;
@@ -111,25 +110,69 @@
             background-color: rgba(89, 2, 25, 0.65); /* #590219 renginin %65 opaklığı */
             z-index: -1;
         }
+
+        /* Yükleme ekranı ve animasyon stilleri */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease-out; /* 3 kat daha hızlı */
+            opacity: 1;
+        }
+
+        #loading-logo {
+            transition: transform 0.5s ease-in; /* 3 kat daha hızlı */
+        }
+
+        #loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #loading-logo.zoom-in {
+            transform: scale(3);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.75s forwards; /* 3 kat daha hızlı */
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100">
     
+    <!-- Yükleme Ekranı -->
+    <div id="loading-screen">
+        <img src="firmus_logo.png" alt="Firmus Logo" class="h-16" id="loading-logo">
+    </div>
+
     <!-- Video Arka Plan ve Overlay -->
-    <video autoplay loop muted playsinline id="hero-video">
+    <video autoplay loop muted playsinline id="hero-video" class="hidden">
         <source src="hero.webm" type="video/webm">
         Tarayıcınız video etiketini desteklemiyor.
     </video>
-    <div id="video-overlay"></div>
+    <div id="video-overlay" class="hidden"></div>
 
     <!-- Main Container -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 fade-in hidden">
 
         <!-- Header and Navigation -->
         <header class="py-6 flex justify-between items-center relative z-20">
             <div>
                 <!-- FIRMUS LOGO -->
-                <img src="firmus_logo.png" alt="Firmus Logo" class="h-10">
+                <img src="firmus_logo.png" alt="Firmus Logo" class="h-10 sm:h-12">
             </div>
             <nav class="hidden md:flex space-x-8 text-sm font-semibold">
                 <a href="#hizmetler" class="hover:text-[#eff294] transition-colors duration-200">Hizmetler</a>
@@ -155,7 +198,7 @@
         </main>
 
         <!-- Hizmetler Section -->
-        <section id="hizmetler" class="py-24 sm:py-32 relative z-10">
+        <section id="hizmetler" class="py-32 sm:py-40 relative z-10">
             <h2 class="text-4xl lg:text-5xl font-thin text-center mb-16">
                 Sunduğumuz Hizmetler
             </h2>
@@ -204,7 +247,7 @@
         </section>
 
         <!-- QR Menü Çözümü Section -->
-        <section id="qr-menu" class="py-24 sm:py-32 relative z-10">
+        <section id="qr-menu" class="py-32 sm:py-48 relative z-10">
             <h2 class="text-4xl lg:text-5xl font-thin text-center mb-16">
                 QR Menü Çözümlerimiz
             </h2>
@@ -223,7 +266,7 @@
                 </div>
                 <!-- Sağ Bölüm: QR Menü Önizlemesi -->
                 <div class="flex justify-center order-2 lg:order-2">
-                     <div class="w-full max-w-lg h-[600px] card-blur rounded-3xl overflow-hidden shadow-2xl">
+                     <div class="w-full max-w-lg h-[70vh] card-blur rounded-3xl overflow-hidden shadow-2xl">
                         <iframe class="w-full h-full" src="https://quekavatsu.github.io/qrmenu" frameborder="0"></iframe>
                     </div>
                 </div>
@@ -231,7 +274,7 @@
         </section>
 
         <!-- Hakkımızda Section -->
-        <section id="hakkimizda" class="py-24 sm:py-32 relative z-10">
+        <section id="hakkimizda" class="py-32 sm:py-40 relative z-10">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="order-2 lg:order-1">
                     <h2 class="text-4xl lg:text-5xl font-thin mb-6">
@@ -253,7 +296,7 @@
         </section>
 
         <!-- Takvim/Randevu Section -->
-        <section id="takvim" class="py-24 sm:py-32 relative z-10">
+        <section id="takvim" class="py-32 sm:py-48 relative z-10">
             <div class="max-w-3xl mx-auto text-center mb-16">
                 <h2 class="text-4xl lg:text-5xl font-thin mb-4">
                     Projeniz İçin Bir Görüşme Ayarlayın
@@ -351,6 +394,30 @@
                 }
             }
         };
+
+        // Sayfa açılış animasyonu
+        const loadingScreen = document.getElementById('loading-screen');
+        const loadingLogo = document.getElementById('loading-logo');
+        const mainContainer = document.querySelector('.max-w-7xl');
+        const videoElement = document.getElementById('hero-video');
+        const videoOverlay = document.getElementById('video-overlay');
+
+        // Sayfa yüklendiğinde animasyonu başlat
+        window.addEventListener('load', () => {
+            loadingLogo.classList.add('zoom-in');
+            
+            setTimeout(() => {
+                loadingScreen.classList.add('fade-out');
+                // Arka plan elemanlarını görünür yap
+                mainContainer.classList.remove('hidden');
+                videoElement.classList.remove('hidden');
+                videoOverlay.classList.remove('hidden');
+            }, 500); // Yakınlaştırma animasyonu süresi (1500 / 3 = 500ms)
+
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 1000); // Yükleme ekranını tamamen gizle (3000 / 3 = 1000ms)
+        });
 
         // Bu kısımda Firebase kurulumu hatasından sonra bile diğer scriptin çalışması sağlanır
         window.onload = async () => {
