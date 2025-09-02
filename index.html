@@ -67,7 +67,7 @@
         }
         
         /* Canvas için stil */
-        #trail-canvas {
+        #star-canvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -76,7 +76,7 @@
             pointer-events: none;
             z-index: -1;
         }
-
+        
         /* Onay modalı için stil */
         .modal-overlay {
             position: fixed;
@@ -101,12 +101,35 @@
             text-align: center;
             border: 1px solid rgba(75, 85, 99, 0.3);
         }
+
+        .iphone-container {
+            position: relative;
+            width: 320px;
+            height: 640px;
+        }
+
+        .iphone-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .iphone-screen {
+            position: absolute;
+            top: 6.8%;
+            left: 4.8%;
+            width: 90.5%;
+            height: 87.5%;
+            border-radius: 20px;
+        }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100">
     
-    <!-- Mouse Takip Eden Parıltı Efekti için Canvas -->
-    <canvas id="trail-canvas"></canvas>
+    <!-- Kayan Yıldız Efekti için Canvas -->
+    <canvas id="star-canvas"></canvas>
 
     <!-- Main Container -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -115,7 +138,7 @@
         <header class="py-6 flex justify-between items-center relative z-20">
             <div>
                 <!-- FIRMUS LOGO -->
-                <img src="firmus_logo.png" alt="Firmus Logo" class="h-80">
+                <img src="firmus_logo.png" alt="Firmus Logo" class="h-40">
             </div>
             <nav class="hidden md:flex space-x-8 text-sm">
                 <a href="#hizmetler" class="hover:text-white transition-colors duration-200">Hizmetler</a>
@@ -185,6 +208,35 @@
                     </div>
                     <h3 class="text-xl font-medium text-white mb-2">Pazaryeri Kurulumu</h3>
                     <p class="text-sm text-gray-400">Kendi çok satıcılı pazaryeri platformunuzu kurarak e-ticaretinizi genişletin.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- QR Menü Çözümü Section -->
+        <section id="qr-menu" class="py-24 sm:py-32 relative z-10">
+            <h2 class="text-4xl lg:text-5xl font-thin text-center mb-16">
+                QR Menü Çözümlerimiz
+            </h2>
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Sol Bölüm: Gerçekçi iPhone -->
+                <div class="flex justify-center order-2 lg:order-1">
+                    <div class="relative w-[300px] h-[600px]">
+                        <img src="phone.png" alt="Dummy iPhone 16 Pro Max" class="absolute inset-0 w-full h-full object-contain">
+                        <iframe class="absolute iphone-screen" src="https://quekavatsu.github.io/qrmenu" frameborder="0"></iframe>
+                    </div>
+                </div>
+
+                <!-- Sağ Bölüm: Tanıtım Metni -->
+                <div class="order-1 lg:order-2">
+                    <h3 class="text-3xl font-thin mb-6">
+                        Dijital Menünüz, İşletmenizin İmzası Olsun
+                    </h3>
+                    <p class="text-lg text-gray-300 mb-6">
+                        Piyasada sunulan basit ve statik menülerin aksine, Firmus olarak işletmeniz için dinamik, etkileşimli ve tamamen yenilikçi QR menü çözümleri geliştiriyoruz. Rakiplerinizin sunduğu basit birer Word dosyası niteliğindeki çözümlerin aksine, bizim menülerimiz akışkan tasarımları ve hızlı kullanıcı arayüzleri ile müşterilerinize unutulmaz bir deneyim sunar.
+                    </p>
+                    <p class="text-lg text-gray-300">
+                        Menünüzü dilediğiniz zaman, dilediğiniz yerden anlık olarak güncelleyin. Görsel olarak zengin ve hareketli menülerle markanızın modern yüzünü ortaya çıkarın. Dijital dönüşümde bir adım öne geçin.
+                    </p>
                 </div>
             </div>
         </section>
@@ -317,14 +369,11 @@
             if (auth) {
                 await signIn();
             }
-
-            // Mouse Takip Efekti
-            const canvas = document.getElementById('trail-canvas');
+            
+            // Kayan yıldız efekti
+            const canvas = document.getElementById('star-canvas');
             const ctx = canvas.getContext('2d');
-            let particles = [];
-            let mouseX = 0;
-            let mouseY = 0;
-
+            
             function resizeCanvas() {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
@@ -332,43 +381,48 @@
             window.addEventListener('resize', resizeCanvas);
             resizeCanvas();
 
-            document.addEventListener('mousemove', (e) => {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-                for (let i = 0; i < 5; i++) {
-                    particles.push({
-                        x: mouseX,
-                        y: mouseY,
-                        size: Math.random() * 3 + 1,
-                        initialOpacity: 0.25,
-                        initialLife: 50,
-                        life: 50,
-                        speedX: (Math.random() - 0.5) * 1,
-                        speedY: (Math.random() - 0.5) * 1
+            const stars = [];
+            const numStars = 200;
+
+            function createStars() {
+                for (let i = 0; i < numStars; i++) {
+                    stars.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        radius: Math.random() * 1.5,
+                        speed: Math.random() * 0.5 + 0.1,
+                        color: `rgba(255, 255, 255, ${Math.random()})`
                     });
                 }
-            });
+            }
+
+            function drawStars() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#0d0d0d';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                stars.forEach(star => {
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = star.color;
+                    ctx.fill();
+                    
+                    star.x -= star.speed;
+                    if (star.x < 0) {
+                        star.x = canvas.width;
+                        star.y = Math.random() * canvas.height;
+                    }
+                });
+            }
 
             function animate() {
                 requestAnimationFrame(animate);
-                ctx.fillStyle = 'rgba(13, 13, 13, 0.4)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                for (let i = 0; i < particles.length; i++) {
-                    const p = particles[i];
-                    p.x += p.speedX;
-                    p.y += p.speedY;
-                    p.life--;
-                    p.opacity = p.initialOpacity * (p.life / p.initialLife);
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(0, 255, 255, ${p.opacity})`;
-                    ctx.fill();
-                    ctx.closePath();
-                }
-                particles = particles.filter(p => p.life > 0);
+                drawStars();
             }
+            
+            createStars();
             animate();
-
+            
             // Takvim ve Randevu Sistemi
             const calendarDaysEl = document.getElementById('calendar-days');
             const monthYearEl = document.getElementById('month-year');
