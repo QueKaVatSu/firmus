@@ -110,6 +110,13 @@
             background-color: rgba(89, 2, 25, 0.65); /* #590219 renginin %65 opaklığı */
             z-index: -1;
         }
+
+        /* Hero metin hizalamasını mobil için ayarla */
+        @media (max-width: 768px) {
+            .hero-content {
+                margin-top: -10vh; /* İstediğiniz yukarı kaydırma miktarını ayarlayabilirsiniz */
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100">
@@ -140,7 +147,7 @@
 
         <!-- Hero Section -->
         <main class="min-h-screen flex items-center justify-center text-center relative z-10 py-16">
-            <div>
+            <div class="hero-content">
                 <h1 class="text-4xl sm:text-6xl lg:text-8xl tracking-tight leading-none mb-6 text-white">
                     Dijital Deneyimin<br><span class="text-[#590219]">Yeni Adresi</span>
                 </h1>
