@@ -60,7 +60,7 @@
         .calendar-day.is-today-animated {
             transform: scale(1.2) translateZ(50px);
             background-color: #eff294; /* Tailwind indigo-500 */
-            color: white;
+            color: #590219;
             box-shadow: 0 0 20px rgba(239, 242, 148, 0.7);
             border: 2px solid white;
         }
@@ -278,28 +278,28 @@
                     Sizin için en uygun zamanı seçin ve ekibimizle bir ön görüşme ayarlayın.
                 </p>
             </div>
-            <div class="max-w-4xl mx-auto bg-[#eff294] p-8 rounded-3xl">
-                <div class="flex flex-col lg:flex-row gap-8 text-gray-900">
+            <div class="max-w-4xl mx-auto bg-[#590219] p-8 rounded-3xl">
+                <div class="flex flex-col lg:flex-row gap-8 text-white">
                     <!-- Sol Bölüm: Takvim -->
                     <div class="flex-1">
                         <div class="flex justify-between items-center mb-4">
-                            <button class="text-gray-900 hover:text-white transition-colors duration-200">
+                            <button class="text-[#eff294] hover:text-white transition-colors duration-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
                             </button>
                             <span id="month-year" class="text-lg font-semibold"></span>
-                            <button class="text-gray-900 hover:text-white transition-colors duration-200">
+                            <button class="text-[#eff294] hover:text-white transition-colors duration-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                             </button>
                         </div>
-                        <div class="calendar-grid text-sm text-center font-medium text-gray-700">
+                        <div class="calendar-grid text-sm text-center font-medium text-[#eff294]">
                             <span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz</span>
                         </div>
-                        <div id="calendar-days" class="calendar-grid mt-2 text-sm text-gray-900">
+                        <div id="calendar-days" class="calendar-grid mt-2 text-sm text-white">
                             <!-- Günler JavaScript ile dinamik olarak eklenecek -->
                         </div>
                     </div>
                     <!-- Sağ Bölüm: Randevu Detayları -->
-                    <div class="flex-1 flex flex-col items-center p-6 bg-[#590219] rounded-3xl text-white">
+                    <div class="flex-1 flex flex-col items-center p-6 bg-[#420112] rounded-3xl text-white">
                         <h4 class="text-xl font-medium mb-4">Görüşme Zamanı</h4>
                         <div id="time-slots" class="flex flex-wrap gap-2 text-center">
                             <!-- Saat slotları dinamik olarak eklenecek -->
@@ -307,8 +307,8 @@
                         <p class="mt-6 text-gray-300 text-sm" id="slot-info">
                             Randevu için gün ve saat seçimi yapabilirsiniz.
                         </p>
-                        <input type="email" id="user-email" placeholder="E-posta adresiniz" class="mt-4 w-full p-2 bg-[#420112] text-white rounded-md border border-[#30010c] focus:outline-none focus:ring-2 focus:ring-[#eff294]">
-                        <button id="book-appointment-btn" class="mt-4 px-6 py-3 rounded-full text-base font-medium text-white bg-[#590219] hover:bg-[#3d0111] transition-colors duration-300 w-full" disabled>
+                        <input type="email" id="user-email" placeholder="E-posta adresiniz" class="mt-4 w-full p-2 bg-[#30010c] text-white rounded-md border border-[#420112] focus:outline-none focus:ring-2 focus:ring-[#eff294]">
+                        <button id="book-appointment-btn" class="mt-4 px-6 py-3 rounded-full text-base font-medium text-white bg-[#eff294] hover:bg-[#c9cd70] transition-colors duration-300 w-full" disabled>
                             Randevu Oluştur
                         </button>
                     </div>
@@ -441,7 +441,7 @@
                     for (let minute = 0; minute < 60; minute += 30) {
                         const time = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
                         const slotDiv = document.createElement('span');
-                        slotDiv.className = 'px-4 py-2 rounded-full border border-gray-700 text-sm hover:bg-[#eff294] transition-colors duration-200 cursor-pointer time-slot';
+                        slotDiv.className = 'px-4 py-2 rounded-full border border-[#eff294] text-sm hover:bg-[#eff294] transition-colors duration-200 cursor-pointer time-slot';
                         slotDiv.textContent = time;
                         slotDiv.dataset.time = time;
                         timeSlotsEl.appendChild(slotDiv);
