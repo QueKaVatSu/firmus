@@ -15,7 +15,7 @@
         body {
             font-family: 'Inter', sans-serif;
             cursor: none;
-            background-color: #0d0d0d;
+            background-color: #590219;
             color: #e5e5e5;
             line-height: 1.6;
             overflow-x: hidden;
@@ -33,7 +33,7 @@
         }
         
         .bg-gradient-fade {
-            background: linear-gradient(to top, #0d0d0d, rgba(13, 13, 13, 0));
+            background: linear-gradient(to top, #590219, rgba(89, 2, 25, 0));
         }
 
         .card-blur {
@@ -66,17 +66,6 @@
             border: 2px solid white;
         }
         
-        /* Canvas için stil */
-        #star-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
         /* Onay modalı için stil */
         .modal-overlay {
             position: fixed;
@@ -104,8 +93,8 @@
 
         .iphone-container {
             position: relative;
-            width: 320px;
-            height: 640px;
+            width: 370px;
+            height: 750px;
         }
 
         .iphone-frame {
@@ -122,14 +111,39 @@
             left: 4.8%;
             width: 90.5%;
             height: 87.5%;
-            border-radius: 20px;
+            border-radius: 40px; /* iPhone 16 Pro Max için daha geniş bir radius */
+        }
+        
+        /* Video arka plan için stil */
+        #hero-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -2;
+        }
+        
+        #video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(89, 2, 25, 0.65); /* #590219 renginin %65 opaklığı */
+            z-index: -1;
         }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100">
     
-    <!-- Kayan Yıldız Efekti için Canvas -->
-    <canvas id="star-canvas"></canvas>
+    <!-- Video Arka Plan ve Overlay -->
+    <video autoplay loop muted playsinline id="hero-video">
+        <source src="hero.webm" type="video/webm">
+        Tarayıcınız video etiketini desteklemiyor.
+    </video>
+    <div id="video-overlay"></div>
 
     <!-- Main Container -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -140,7 +154,7 @@
                 <!-- FIRMUS LOGO -->
                 <img src="firmus_logo.png" alt="Firmus Logo" class="h-10">
             </div>
-            <nav class="hidden md:flex space-x-8 text-sm">
+            <nav class="hidden md:flex space-x-8 text-sm font-semibold">
                 <a href="#hizmetler" class="hover:text-white transition-colors duration-200">Hizmetler</a>
                 <a href="#hakkimizda" class="hover:text-white transition-colors duration-200">Hakkımızda</a>
                 <a href="#takvim" class="hover:text-white transition-colors duration-200 text-[#24c1e4]">Randevu Al</a>
@@ -369,59 +383,6 @@
             if (auth) {
                 await signIn();
             }
-            
-            // Kayan yıldız efekti
-            const canvas = document.getElementById('star-canvas');
-            const ctx = canvas.getContext('2d');
-            
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-
-            const stars = [];
-            const numStars = 200;
-
-            function createStars() {
-                for (let i = 0; i < numStars; i++) {
-                    stars.push({
-                        x: Math.random() * canvas.width,
-                        y: Math.random() * canvas.height,
-                        radius: Math.random() * 1.5,
-                        speed: Math.random() * 0.5 + 0.1,
-                        color: `rgba(255, 255, 255, ${Math.random()})`
-                    });
-                }
-            }
-
-            function drawStars() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#0d0d0d';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                stars.forEach(star => {
-                    ctx.beginPath();
-                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = star.color;
-                    ctx.fill();
-                    
-                    star.x -= star.speed;
-                    if (star.x < 0) {
-                        star.x = canvas.width;
-                        star.y = Math.random() * canvas.height;
-                    }
-                });
-            }
-
-            function animate() {
-                requestAnimationFrame(animate);
-                drawStars();
-            }
-            
-            createStars();
-            animate();
             
             // Takvim ve Randevu Sistemi
             const calendarDaysEl = document.getElementById('calendar-days');
