@@ -114,13 +114,13 @@
         <!-- Header and Navigation -->
         <header class="py-6 flex justify-between items-center relative z-20">
             <div>
-                <div class="text-xl font-bold tracking-widest text-white">Firmus</div>
+                <img src="https://placehold.co/150x40/0d0d0d/FFFFFF?text=FIRMUS+LOGO" alt="Firmus Logo" class="h-10">
                 <p class="text-sm text-gray-400 mt-1">Solution and Evolution Partner</p>
             </div>
             <nav class="hidden md:flex space-x-8 text-sm">
                 <a href="#hizmetler" class="hover:text-white transition-colors duration-200">Hizmetler</a>
                 <a href="#hakkimizda" class="hover:text-white transition-colors duration-200">Hakkımızda</a>
-                <a href="#takvim" class="hover:text-white transition-colors duration-200">Randevu Al</a>
+                <a href="#takvim" class="hover:text-white transition-colors duration-200 text-[#24c1e4]">Randevu Al</a>
                 <a href="#iletisim" class="hover:text-white transition-colors duration-200">İletişim</a>
             </nav>
         </header>
@@ -129,12 +129,12 @@
         <main class="min-h-screen flex items-center justify-center text-center relative z-10 py-16">
             <div>
                 <h1 class="text-4xl sm:text-6xl lg:text-8xl tracking-tight leading-none mb-6 text-white">
-                    Dijital Deneyimin<br>Yeni Adresi
+                    Dijital Deneyimin<br><span class="text-[#24c1e4]">Yeni Adresi</span>
                 </h1>
                 <p class="text-lg sm:text-xl max-w-2xl mx-auto text-gray-400 font-light">
                     Elegant, fonksiyonel ve kullanıcı dostu yazılım çözümleriyle markanızın dijital geleceğini inşa ediyoruz.
                 </p>
-                <a href="#hizmetler" class="mt-8 inline-block px-8 py-4 rounded-full text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-300">
+                <a href="#hizmetler" class="mt-8 inline-block px-8 py-4 rounded-full text-base font-medium transition-colors duration-300 card-blur bg-opacity-25 hover:bg-opacity-50">
                     Hizmetlerimizi Keşfet
                 </a>
             </div>
@@ -251,7 +251,7 @@
                             Randevu için gün ve saat seçimi yapabilirsiniz.
                         </p>
                         <input type="email" id="user-email" placeholder="E-posta adresiniz" class="mt-4 w-full p-2 bg-gray-800 text-white rounded-md border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <button id="book-appointment-btn" class="mt-4 px-6 py-3 rounded-full text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-300 w-full" disabled>
+                        <button id="book-appointment-btn" class="mt-4 px-6 py-3 rounded-full text-base font-medium text-white bg-[#24c1e4] hover:bg-[#1a8e9e] transition-colors duration-300 w-full" disabled>
                             Randevu Oluştur
                         </button>
                     </div>
@@ -290,6 +290,8 @@
         setLogLevel('debug');
 
         let app, db, auth;
+        // Firebase başlatma işlemini bir try/catch bloğu içine alarak,
+        // Firebase yapılandırmasının eksik olduğu durumlarda bile diğer kodun çalışmasını sağlıyoruz.
         try {
             app = initializeApp(firebaseConfig);
             db = getFirestore(app);
@@ -311,7 +313,10 @@
 
         // Bu kısımda Firebase kurulumu hatasından sonra bile diğer scriptin çalışması sağlanır
         window.onload = async () => {
-            await signIn();
+            // Sadece Firebase başlatma işlemi başarılıysa oturum aç
+            if (auth) {
+                await signIn();
+            }
 
             // Mouse Takip Efekti
             const canvas = document.getElementById('trail-canvas');
@@ -383,7 +388,8 @@
 
             let selectedDate = null;
             let selectedTime = null;
-            const recipientEmail = "ataberksarsillmaz@gmail.com";
+            // E-posta adresini kendi adresinizle değiştirin
+            const recipientEmail = "yeni_adresiniz@gmail.com"; 
             const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
 
             monthYearEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
