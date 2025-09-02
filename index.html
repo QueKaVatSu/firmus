@@ -102,7 +102,13 @@
         }
         
         #video-overlay {
-            display: none; /* Bu satır transparan katmanı kaldırır */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(31, 41, 55, 0.05); /* Buzlu camın %66 daha transparan hali */
+            z-index: -1;
         }
 
         /* Hero metin hizalamasını mobil için ayarla */
